@@ -25,36 +25,13 @@ GRIDLOCK v4 is now live !! :)
 IMPROVEMENTS----
 
 
-Gameplay
-
-Kill streaks — 3/5/7/10/15 kills trigger announcements + damage/speed boosts (streak resets if you take damage)
-Score system — points for kills, headshots give 2×, streaks multiply further; shown top-left
-⚡ Blitz mode — new 3rd game mode, 60-second kill race with endless enemy respawns
-
-Enemy AI
-
-3-state alert system — enemies now patrol → alert → combat instead of always rushing. Grey dots on minimap = patrolling, orange = alerted, red = combat
-Patrol routes — idle enemies walk between waypoints; map feels alive between engagements
-Alert propagation — shooting an enemy alerts nearby enemies within radius
-Sniper peek mechanic — sniper enemies duck in/out of cover (peek 1.2s, hide 2.5s)
-Armored enemy type — spawns in wave 4+, tanky with armor plates visual
-
-Visual Polish
-
-Enemy health bars — floating billboard bars above every enemy head, color-coded green → yellow → red
-Low HP vignette — pulsing red border when below 30 HP
-Pooled particles & sparks — no more GC spikes; everything reuses object pools
-Improved death tumble — enemies fall sideways, not just forward
-ADS breathing sway — subtle organic drift while aiming
-
-Performance
-
-Spark effects now fully pooled (was creating/destroying meshes every frame)
-Blood/blast particles fully pooled
-LOS checks throttled by alert state (less frequent when patrolling)
-
-
-
-
-BUG FIXES----
-GAME CRASHED AND FROZE RANDOMLY -- FIXED
+Shared Flow Field Navigation — Instead of every enemy running its own BFS pathfinding every second, a single flow field is computed every 0.7s and all enemies read from it. Far fewer pathfinding calls as enemy count scales up.
+Explosive Barrels — Red-striped barrels (30% of barrel tiles) now detonate when shot or caught in a blast, chain-react to nearby barrels, and deal massive AOE damage to both enemies and the player.
+Suppression System — Enemy near-misses now suppress the player: your mouse sensitivity is cut roughly in half and a ⚠ SUPPRESSED indicator appears. Incentivizes actually taking cover rather than standing still trading shots.
+Enemy Grenade Throwing — Armored enemies and some grunt variants now throw grenades at the player. An ⚠ ENEMY GRENADE! kill-feed warning appears. Enemy grenades only hurt the player (not each other).
+Gunshot Sound Alerting — Firing your weapon now broadcasts an alert to enemies within 16 units, even without line-of-sight. Silenced play is now meaningfully different.
+Extraction Mode — New 4th game mode. Reach a glowing zone in the center of the map and hold it for 30 seconds while enemies continuously swarm. Progress decays when you leave the zone.
+Wave Modifiers — Starting wave 3, each wave randomly rolls a modifier: ARMORED, RUSH, SNIPER, NIGHT OPS (reduced fog/dark sky), or DOUBLE TIME. The modifier is shown on the HUD and affects which enemy types spawn.
+Investigation AI — When enemies hear gunshots but don't have LOS, they now move to your last known position to investigate. A ◎ ENEMIES INVESTIGATING indicator shows on the HUD. The shared last-known-pos also shows as a yellow dot on the minimap.
+Better Weapon Audio — Shotgun and sniper now use a white-noise burst buffer (real noise synthesis) instead of square waves, giving them a much more percussive, distinct sound. SMG and pistol use two detuned oscillators for a richer crack.
+Chromatic Aberration on Damage — Taking damage now triggers a brief chromatic aberration effect via SVG filter on the canvas, plus the existing screen flash. Makes hits feel significantly more impactful.
