@@ -162,6 +162,4 @@ Enemies use shared flow-field pathfinding, line-of-sight checks, cover-seeking, 
 
 ---
 
-## Browser Requirements
-
-Any modern browser with WebGL. Tested in Chrome and Firefox. Pointer lock required.
+Made with <3 by Namish
