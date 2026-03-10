@@ -1,17 +1,49 @@
-# GRIDLOCK v6
+# GRIDLOCK v6.3
 
-Play now at https://grid-lock-black.vercel.app
+Play now at- https://grid-lock-black.vercel.app
+
+---
+
+## What's New in v6.3
+
+### Gameplay
+- **Upgrade system** — after each Survival wave a menu offers 3 random upgrades: Hollow Points, Adrenaline, Extended Mags, Speed Loader, Stim Pack, Reinforced Vest, Grenade Cache, Precision Barrel, Combat Training
+- **Melee combo** — press `V` twice quickly for a combo hit (×1.65 damage, wider range)
+- **Situational grenades** — enemies only throw grenades when you've been stationary (camping), not at random
+- **Sniper retreat** — enemy snipers find new cover when their position is blown
+
+### AI
+- **Separation steering** — enemies push apart from each other while moving; no more funnelling into a single file
+- **Enemy death fade** — enemies collapse forward and fade out instead of instantly disappearing
+
+### Visuals
+- **Procedural ground texture** — cracked concrete with multi-octave noise, tile grid, random cracks, and dirt stains baked into a canvas texture at startup
+- **3D grass** — instanced blade clusters (6 draw calls for all grass on the map) layered over flat 2D ground patches; ankle-height, crossed-plane blades with per-blade colour variation
+- **Minimap moved** — relocated to bottom-right to stop overlapping the grenade counter
+
+### Performance
+- **Spatial grid** — broad-phase neighbour lookup replaces O(n²) entity scan
+- **Instanced grass** — ~30,000 individual mesh draw calls reduced to 6 via `THREE.InstancedMesh`
+- **Minimap dirty-flag** — wall layer pre-rendered to an offscreen canvas; only dynamic elements redrawn each frame
+- **Audio suspend** — Web Audio context suspends on alt-tab and resumes on focus
+
+---
+
+## Play
+
+Download `gridlock_v6.3.html` and open it in any modern browser. Pointer lock is required — click the canvas to capture your mouse.
+
 ---
 
 ## Game Modes
 
 | Mode | Objective |
 |------|-----------|
-| **Survival** | Survive endless enemy waves. Each wave grows larger and harder. |
+| **Survival** | Survive endless enemy waves. Each cleared wave offers an upgrade. |
 | **Hunt** | Eliminate a high-value target (HVT boss) protected by regular enemies. |
-| **Blitz** | Kill as many enemies as possible in 60 seconds. Score attack. |
+| **Blitz** | Kill as many enemies as possible in 60 seconds. No upgrades. |
 | **Extraction** | Reach and hold the extraction zone under enemy pressure. |
-| **Escort** | Keep a randomly-named VIP alive as they wander near you. Survive scripted ambush waves at key phases. |
+| **Escort** | Keep a randomly-named VIP alive through scripted ambush waves. |
 
 ---
 
@@ -21,60 +53,74 @@ Play now at https://grid-lock-black.vercel.app
 |-----|--------|
 | `W A S D` | Move |
 | `Shift` | Sprint |
-| `Ctrl` | Crouch (reduces spread and recoil) |
+| `Ctrl` | Crouch (reduces spread) |
 | `Space` | Jump |
 | `LMB` | Fire |
 | `RMB` (hold) | Aim down sights (ADS) |
 | `Q` | Cycle weapon |
 | `R` | Reload |
 | `G` | Throw grenade |
-| `V` | Melee attack |
+| `V` | Melee attack (double-tap for combo) |
 | `F` | Pick up weapon / ammo / health kit |
 | `I` | Inspect weapon |
 | `Esc` | Pause |
 
 ---
 
+## Upgrades (Survival only)
+
+Offered between waves — choose 1 of 3 random options. Stacks persist until restart.
+
+| Upgrade | Effect |
+|---------|--------|
+| 🔥 Hollow Points | +20% weapon damage |
+| ⚡ Adrenaline | +18% movement speed |
+| 📦 Extended Mags | +8 rounds to all magazines |
+| 🔁 Speed Loader | −30% reload time |
+| 💊 Stim Pack | Restore 50 HP immediately |
+| 🛡 Reinforced Vest | +30 max HP |
+| 💣 Grenade Cache | +2 grenades |
+| 🎯 Precision Barrel | −35% weapon spread |
+| 🥊 Combat Training | +35 melee damage, −25% melee cooldown |
+
+---
+
 ## Weapons
 
-| Weapon | Damage | Mag | Fire Rate | Mode | Notes |
-|--------|--------|-----|-----------|------|-------|
-| **M9 Pistol** | 30 | 12 | Semi | Semi-auto | Starting weapon, reliable at all ranges |
-| **M870 Shotgun** | 14 × 6 pellets | 6 | Slow | Semi-auto | Devastating up close |
-| **MP5 SMG** | 11 | 30 | Fast | Full-auto | High DPS, manageable spread |
-| **M24 Sniper** | 95 | 5 | Very slow | Semi-auto | One-shot most enemies; scoped ADS |
-
-Weapons spawn as pickups on the map. Ammo crates and dropped ammo refill reserves. Crouching reduces spread by 50%.
+| Weapon | Damage | Mag | Mode | Notes |
+|--------|--------|-----|------|-------|
+| **M9 Pistol** | 30 | 12 | Semi | Starting weapon |
+| **M870 Shotgun** | 14 × 6 pellets | 6 | Semi | Devastating up close |
+| **MP5 SMG** | 11 | 30 | Full-auto | High DPS |
+| **M24 Sniper** | 95 | 5 | Semi | One-shot most enemies; scoped ADS |
 
 ---
 
 ## Enemies
 
-| Type | Indicator | Behaviour |
-|------|-----------|-----------|
-| **Grunt** | Blue | Standard AI — seeks cover, peeks to fire |
-| **Rusher** | Orange | Fast, low health, flanks aggressively |
-| **Armored** | Dark/grey | High health, throws grenades, moves slower |
-| **Sniper** | Green | Long range, seeks elevated cover, high damage |
-| **Boss (HVT)** | Red aura | Hunt mode only — large health pool, high damage, red bullet tracer |
+| Type | Behaviour |
+|------|-----------|
+| **Grunt** | Seeks cover, peeks to fire, may throw grenades |
+| **Rusher** | Fast, low health, flanks aggressively |
+| **Armored** | High health, throws grenades, moves slower |
+| **Sniper** | Long range, elevated cover, retreats when exposed |
+| **Boss** | Hunt mode only — large HP pool, red bullet tracer |
 
-Enemies use shared flow-field pathfinding, line-of-sight checks, cover-seeking, suppression fire, and grenade throws.
+Enemies use shared flow-field pathfinding, line-of-sight checks, cover-seeking, suppression fire, separation steering, and situational grenade throws.
 
 ### Wave Modifiers
 
-Each wave after wave 2 may roll a modifier:
-
-- **Armored Wave** — majority of spawns are armored enemies
-- **Rush Wave** — majority of spawns are rushers
-- **Sniper Wave** — majority of spawns are snipers
-- **Elite Wave** — all stats boosted
-- **Night Wave** — reduced visibility (fog thickens)
+| Modifier | Effect |
+|----------|--------|
+| Armored Wave | Majority armored enemies |
+| Rush Wave | Majority rushers |
+| Sniper Wave | Majority snipers |
+| Night Ops | Reduced visibility |
+| Double Time | All enemies faster |
 
 ---
 
 ## Kill Streaks
-
-Kill multiple enemies without dying to trigger streak bonuses. Streak resets on death.
 
 | Streak | Name | Bonus |
 |--------|------|-------|
@@ -84,55 +130,38 @@ Kill multiple enemies without dying to trigger streak bonuses. Streak resets on 
 | 10 | Unstoppable | +Damage & Speed |
 | 15 | Legendary | +Damage & Speed |
 
-Headshots and melee kills count toward streaks. Score multiplier scales with current streak count.
+---
+
+## Escort Mode
+
+- VIP wanders within ~6 units of your position, stops when under fire
+- Enemies actively target the VIP
+- 4 scripted ambush waves at kill-count thresholds
+- On-screen arrow points to off-screen VIP
+- VIP speaks contextual lines throughout the mission
 
 ---
 
-## Scoring
+## Map
 
-- Standard kill: 100 pts
-- Headshot: 2× multiplier
-- Melee kill: bonus points
-- Active streak: score scales by `1 + streak × 0.1`
-- Scores are saved to a local leaderboard (top 10, stored in `localStorage`)
-
----
-
-## Escort Mode — Details
-
-The VIP is a randomly named agent (Agent Zero, Dr. Atlas, Colonel Rex, etc.) who wanders near you while you keep enemies off them.
-
-- VIP moves to random points within ~6 units of your position
-- Stops moving when taking fire — crouches and suppresses
-- Passively regenerates HP when not under fire
-- Enemies actively check line-of-sight to the VIP and shoot if close enough
-- **4 scripted ambush waves** trigger at phases 2, 4, 6, and 8 — larger enemy bursts with increasing speed
-- A directional arrow appears on-screen pointing toward the VIP when they're off-screen
-- VIP speaks contextual lines (start, moving, under fire, low HP, etc.)
-- Mission fails if VIP HP reaches 0
-
----
-
-## Map Features
-
-- **Explosive barrels** — shoot to detonate; damages nearby enemies and players
-- **Health kits** — 4 fixed spawn locations, restore 50 HP, press `F` to collect
-- **Weapon pickups** — SMG, Shotgun, Sniper spawn at fixed spots
-- **Ammo drops** — enemies occasionally drop ammo on death
-- **Minimap** — top-right corner; shows player, enemies (by alert state), VIP (Escort mode), and health kit locations
-- **Compass** — enemy dots appear on the compass bar when in your forward arc
+- **Explosive barrels** — shoot to detonate
+- **Health kits** — press `F` to collect, restore 50 HP
+- **Weapon & ammo pickups** — scattered across the map
+- **Minimap** — bottom-right; shows player, enemies, VIP, pickups
+- **Compass** — enemy dots in your forward arc
 
 ---
 
 ## Tech
 
 - **Three.js r128** — rendering, scene, geometry
-- **Single HTML file** — all JS, CSS, and assets inline; no dependencies to install
-- **Web Audio API** — procedural sound (oscillators + noise) for all weapons and effects
-- **localStorage** — leaderboard persistence only; no other data is stored or transmitted
+- **Single HTML file** — all JS, CSS, and audio inline; no dependencies
+- **Web Audio API** — procedural oscillator-based sound for all weapons and effects
+- **InstancedMesh** — all 3D grass rendered in 6 draw calls
+- **localStorage** — leaderboard persistence only
 
 ---
-Thanks 
 
+## Browser Requirements
 
-Made with <3 by Namish
+Any modern browser with WebGL. Tested in Chrome and Firefox. Pointer lock required.
