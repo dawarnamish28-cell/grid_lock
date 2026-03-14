@@ -29,11 +29,6 @@ Play now at- https://grid-lock-black.vercel.app
 
 ---
 
-## Play
-
-Download `gridlock_v6.3.html` and open it in any modern browser. Pointer lock is required — click the canvas to capture your mouse.
-
----
 
 ## Game Modes
 
